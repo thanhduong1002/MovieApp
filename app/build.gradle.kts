@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -15,6 +18,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProfile = rootProject.file("local.properties")
+        if (localProfile.exists()) {
+            val localPro = Properties()
+            localPro.load(FileInputStream(localProfile))
+
+            buildConfigField("String", "API_KEY", "\"${localPro["MY_API_KEY"]}\"")
+        }
     }
 
     buildTypes {
@@ -35,6 +46,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -55,4 +67,5 @@ dependencies {
     implementation("com.airbnb.android:lottie:3.4.0")
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
 }
