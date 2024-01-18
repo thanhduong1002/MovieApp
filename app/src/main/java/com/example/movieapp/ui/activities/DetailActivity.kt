@@ -2,6 +2,7 @@ package com.example.movieapp.ui.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.movieapp.R
 import com.example.movieapp.adapters.FragmentTabAdapter
@@ -39,5 +40,11 @@ class DetailActivity : AppCompatActivity() {
                 }
             }.attach()
         }
+
+        Log.d("movieId", "id: ${intent.getIntExtra(movieId, 0)}")
+    }
+
+    companion object {
+        const val movieId = "MovieId"
     }
 }

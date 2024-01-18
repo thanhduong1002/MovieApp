@@ -5,4 +5,7 @@
     <color name="gray">#A9A9A9</color>
     <color name="blue_spider">#21566C</color>
     <color name="blue_spider2">#085AEE</color>
+    <color name="colorPrimary">#a51e22</color>
+    <color name="colorPrimaryDark">#800000</color>
+    <color name="colorAccent">#03DAC5</color>
 </resources>
