@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
@@ -19,7 +21,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var movieViewModel: MovieViewModel
     private lateinit var topRatedAdapter: TopRatedAdapter
     private lateinit var listTopRated: List<Results>
-    private var currentMovie: Int = 0
+    private var positionCurrentMovie: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -30,6 +32,7 @@ class HomeActivity : AppCompatActivity() {
         setupTopRatedCarousel()
         observeTopRatedCarousel()
         handleButton()
+        handleShowHideToolbar()
     }
 
     private fun setupTopRatedCarousel() {
@@ -48,9 +51,11 @@ class HomeActivity : AppCompatActivity() {
         }
 
         movieViewModel.listTopRated.observe(this) { list ->
-            listTopRated = list
-            topRatedAdapter = TopRatedAdapter(list)
-            binding.viewPagerTopRated.adapter = topRatedAdapter
+            list?.let {
+                listTopRated = list
+                topRatedAdapter = TopRatedAdapter(list)
+                binding.viewPagerTopRated.adapter = topRatedAdapter
+            }
         }
 
         val compositePageTransformer = CompositePageTransformer()
@@ -63,7 +68,8 @@ class HomeActivity : AppCompatActivity() {
             setPageTransformer(compositePageTransformer)
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
-                    currentMovie = position
+                    Log.d("position", "position: $position")
+                    positionCurrentMovie = position
                 }
             })
         }
@@ -71,10 +77,36 @@ class HomeActivity : AppCompatActivity() {
 
     private fun handleButton() {
         binding.apply {
-            buttonPlay.setOnClickListener {
-                Intent(this@HomeActivity, DetailActivity::class.java).run {
-                    startActivity(this)
+            buttonDetail.setOnClickListener {
+                Intent(this@HomeActivity, DetailActivity::class.java)
+                    .putExtra(DetailActivity.movieId, listTopRated[positionCurrentMovie].id)
+                    .run {
+                        startActivity(this)
+                    }
+            }
+        }
+    }
+
+    private fun handleShowHideToolbar() {
+        var isShow = false
+        var scrollRange = -1
+
+        binding.appBar.addOnOffsetChangedListener { _, verticalOffset ->
+            if (scrollRange == -1) {
+                scrollRange = binding.appBar.totalScrollRange
+            }
+            if (scrollRange + verticalOffset == 0) {
+                binding.apply {
+                    relativeAvatar.visibility = View.INVISIBLE
+                    toolbar.visibility = View.VISIBLE
                 }
+                isShow = true
+            } else if (isShow) {
+                binding.apply {
+                    relativeAvatar.visibility = View.VISIBLE
+                    toolbar.visibility = View.INVISIBLE
+                }
+                isShow = false
             }
         }
     }
