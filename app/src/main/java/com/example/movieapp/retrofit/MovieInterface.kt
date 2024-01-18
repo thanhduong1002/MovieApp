@@ -1,8 +1,10 @@
 package com.example.movieapp.retrofit
 
+import com.example.movieapp.models.DetailMovieResponse
 import com.example.movieapp.models.PopularResponse
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MovieInterface {
@@ -10,13 +12,27 @@ interface MovieInterface {
     fun getPopularList(
         @Query("language") language: String,
         @Query("page") page: Int,
-        @Query("api_key") apiKey: String,
+        @Query("api_key") apiKey: String
     ): Call<PopularResponse>
 
     @GET("top_rated")
     fun getTopRatedList(
         @Query("language") language: String,
         @Query("page") page: Int,
-        @Query("api_key") apiKey: String,
+        @Query("api_key") apiKey: String
     ): Call<PopularResponse>
+
+    @GET("upcoming")
+    fun getUpcomingList(
+        @Query("language") language: String,
+        @Query("page") page: Int,
+        @Query("api_key") apiKey: String
+    ): Call<PopularResponse>
+
+    @GET("{movie_id}")
+    fun getMovieDetails(
+        @Path("movie_id") movieId: Int,
+        @Query("language") language: String,
+        @Query("api_key") apiKey: String
+    ): Call<DetailMovieResponse>
 }

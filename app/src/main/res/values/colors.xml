@@ -8,4 +8,5 @@
     <color name="colorPrimary">#a51e22</color>
     <color name="colorPrimaryDark">#800000</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="backgroundLightButton">#D6D7D7</color>
 </resources>

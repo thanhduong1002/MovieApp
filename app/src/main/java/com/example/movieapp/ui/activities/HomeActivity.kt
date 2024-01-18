@@ -4,23 +4,28 @@ import android.content.Intent
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import com.example.movieapp.adapters.MovieAdapter
 import com.example.movieapp.adapters.TopRatedAdapter
 import com.example.movieapp.databinding.ActivityHomeBinding
+import com.example.movieapp.interfaces.IChooseMovie
 import com.example.movieapp.models.Results
+import com.example.movieapp.ui.fragments.DetailMovieSheet
 import com.example.movieapp.viewmodels.MovieViewModel
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), IChooseMovie {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var movieViewModel: MovieViewModel
     private lateinit var topRatedAdapter: TopRatedAdapter
-    private lateinit var listTopRated: List<Results>
+    private lateinit var popularAdapter: MovieAdapter
+    private lateinit var upcomingAdapter: MovieAdapter
+    private lateinit var listTopRatedMovie: List<Results>
     private var positionCurrentMovie: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,19 +34,23 @@ class HomeActivity : AppCompatActivity() {
 
         movieViewModel = ViewModelProvider(this)[MovieViewModel::class.java]
 
-        setupTopRatedCarousel()
-        observeTopRatedCarousel()
+        setupTopRatedCarouselAndRecyclerView()
+        observeTopRatedCarouselAndRecyclerView()
         handleButton()
         handleShowHideToolbar()
     }
 
-    private fun setupTopRatedCarousel() {
+    private fun setupTopRatedCarouselAndRecyclerView() {
         topRatedAdapter = TopRatedAdapter(emptyList())
+        popularAdapter = MovieAdapter(emptyList(), this)
+        upcomingAdapter = MovieAdapter(emptyList(), this)
 
         movieViewModel.getTopRatedList("en-US", 1)
+        movieViewModel.getPopularList("en-US", 1)
+        movieViewModel.getUpcomingList("en-US", 1)
     }
 
-    private fun observeTopRatedCarousel() {
+    private fun observeTopRatedCarouselAndRecyclerView() {
         binding.viewPagerTopRated.apply {
             clipChildren = false
             clipToPadding = false
@@ -50,11 +59,33 @@ class HomeActivity : AppCompatActivity() {
                 RecyclerView.OVER_SCROLL_NEVER
         }
 
-        movieViewModel.listTopRated.observe(this) { list ->
-            list?.let {
-                listTopRated = list
-                topRatedAdapter = TopRatedAdapter(list)
-                binding.viewPagerTopRated.adapter = topRatedAdapter
+        movieViewModel.apply {
+            listTopRated.observe(this@HomeActivity) { list ->
+                list?.let {
+                    listTopRatedMovie = list
+                    topRatedAdapter = TopRatedAdapter(list)
+                    binding.viewPagerTopRated.adapter = topRatedAdapter
+                }
+            }
+
+            listPopulars.observe(this@HomeActivity) { listPop ->
+                listPop?.let {
+                    popularAdapter = MovieAdapter(listPop, this@HomeActivity)
+                    binding.recyclerViewPopular.apply {
+                        layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+                        adapter = popularAdapter
+                    }
+                }
+            }
+
+            listUpcoming.observe(this@HomeActivity) { listUp ->
+                listUp?.let {
+                    upcomingAdapter = MovieAdapter(listUp, this@HomeActivity)
+                    binding.recyclerViewUpcoming.apply {
+                        layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+                        adapter = upcomingAdapter
+                    }
+                }
             }
         }
 
@@ -68,7 +99,6 @@ class HomeActivity : AppCompatActivity() {
             setPageTransformer(compositePageTransformer)
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
-                    Log.d("position", "position: $position")
                     positionCurrentMovie = position
                 }
             })
@@ -79,7 +109,7 @@ class HomeActivity : AppCompatActivity() {
         binding.apply {
             buttonDetail.setOnClickListener {
                 Intent(this@HomeActivity, DetailActivity::class.java)
-                    .putExtra(DetailActivity.movieId, listTopRated[positionCurrentMovie].id)
+                    .putExtra(DetailActivity.movieId, listTopRatedMovie[positionCurrentMovie].id)
                     .run {
                         startActivity(this)
                     }
@@ -109,5 +139,15 @@ class HomeActivity : AppCompatActivity() {
                 isShow = false
             }
         }
+    }
+
+    override fun onClickMovie(idMovie: Int) {
+        val bundle = Bundle().apply {
+            putInt(DetailMovieSheet.idMovie, idMovie)
+        }
+
+        DetailMovieSheet().apply {
+            arguments = bundle
+        }.show(supportFragmentManager, "Detail Movie Tag")
     }
 }
