@@ -70,4 +70,5 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+    implementation("com.airbnb.android:lottie:3.4.0")
 }

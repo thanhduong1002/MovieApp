@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.activities.DetailActivity">
 
+    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewYoutube"
+        app:autoPlay="false"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.tabs.TabLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,7 +21,7 @@
         app:tabSelectedTextColor="@color/blue_spider"
         app:tabTextColor="@color/black"
         style="@style/TabLayoutTextStyle"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/viewYoutube"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:layout_width="match_parent"
