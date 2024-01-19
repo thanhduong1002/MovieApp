@@ -1,12 +1,14 @@
 package com.example.movieapp.ui.fragments
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.example.movieapp.databinding.FragmentDetailMovieSheetBinding
+import com.example.movieapp.ui.activities.DetailActivity
 import com.example.movieapp.viewmodels.MovieViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso
@@ -28,16 +30,9 @@ class DetailMovieSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        movieViewModel.getDetailMovie(movieId, "en-US")
-
-        binding.apply {
-            buttonClose.setOnClickListener {
-                dismiss()
-            }
-        }
-
+        setupLoading()
+        handleOnClickButton()
         observeDetailMovie()
     }
 
@@ -50,8 +45,10 @@ class DetailMovieSheet : BottomSheetDialogFragment() {
         else "12+"
     }
 
+    @SuppressLint("SetTextI18n")
     private fun observeDetailMovie() {
         movieViewModel.detailMovie.observe(this) { detail ->
+            binding.animationView.visibility = View.GONE
             detail?.let {
                 binding.apply {
                     Picasso.get().load("https://image.tmdb.org/t/p/w342${it.posterPath}")
@@ -60,6 +57,30 @@ class DetailMovieSheet : BottomSheetDialogFragment() {
                     yearRelease.text = "${it.releaseDate?.substring(0,4)}   ${checkAdult(it.adult)}   ${it.voteAverage} points"
                     overviewMovie.text = it.overview
                 }
+            }
+        }
+    }
+
+    private fun setupLoading() {
+        binding.animationView.apply {
+            setAnimationFromUrl("https://lottie.host/2ddcb019-af8f-4926-97c3-574640b158f7/74YUezeJqO.json")
+            playAnimation()
+        }
+
+        movieViewModel.getDetailMovie(movieId, "en-US")
+    }
+
+    private fun handleOnClickButton() {
+        binding.apply {
+            buttonClose.setOnClickListener {
+                dismiss()
+            }
+            buttonDetail.setOnClickListener {
+                Intent(requireActivity(), DetailActivity::class.java)
+                    .putExtra(DetailActivity.movieId, movieId)
+                    .run {
+                        startActivity(this)
+                    }
             }
         }
     }

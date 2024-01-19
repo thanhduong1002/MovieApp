@@ -4,16 +4,9 @@
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@android:color/transparent" />
-            <corners android:radius="20dp" />
-        </shape>
-    </item>
-
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@android:color/transparent" />
             <stroke
                 android:width="2dp"
-                android:color="#A9A9A9" />
+                android:color="@color/gray" />
             <corners android:radius="20dp" />
         </shape>
     </item>

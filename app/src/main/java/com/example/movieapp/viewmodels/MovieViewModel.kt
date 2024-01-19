@@ -7,6 +7,8 @@ import com.example.movieapp.BuildConfig
 import com.example.movieapp.models.DetailMovieResponse
 import com.example.movieapp.models.PopularResponse
 import com.example.movieapp.models.Results
+import com.example.movieapp.models.VideoResponse
+import com.example.movieapp.models.Videos
 import com.example.movieapp.retrofit.RetroInstance
 import retrofit2.Call
 import retrofit2.Callback
@@ -17,6 +19,7 @@ class MovieViewModel : ViewModel() {
     var listTopRated: MutableLiveData<List<Results>> = MutableLiveData()
     var listUpcoming: MutableLiveData<List<Results>> = MutableLiveData()
     var detailMovie: MutableLiveData<DetailMovieResponse> = MutableLiveData()
+    var videosMovie: MutableLiveData<List<Videos>> = MutableLiveData()
 
     fun getPopularList(language: String, page: Int) {
         RetroInstance.instance.getPopularList(language, page, BuildConfig.API_KEY)
@@ -97,7 +100,6 @@ class MovieViewModel : ViewModel() {
     }
 
     fun getDetailMovie(movieId: Int, language: String) {
-        Log.d("movieId", "movieId: $movieId")
         RetroInstance.instance.getMovieDetails(movieId, language, BuildConfig.API_KEY)
             .enqueue(object : Callback<DetailMovieResponse> {
                 override fun onResponse(
@@ -117,6 +119,32 @@ class MovieViewModel : ViewModel() {
 
                 override fun onFailure(call: Call<DetailMovieResponse>, t: Throwable) {
                     detailMovie.postValue(null)
+
+                    Log.d("API_CALL", "API call failed. Throwable: ${t.message}")
+                }
+            })
+    }
+
+    fun getVideoById(movieId: Int, language: String) {
+        RetroInstance.instance.getVideoById(movieId, language, BuildConfig.API_KEY)
+            .enqueue(object : Callback<VideoResponse> {
+                override fun onResponse(
+                    call: Call<VideoResponse>,
+                    response: Response<VideoResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val videos = response.body()?.results
+
+                        videosMovie.postValue(videos)
+                    } else {
+                        val videos = response.body()
+
+                        Log.d("Failed", "Failed: $videos")
+                    }
+                }
+
+                override fun onFailure(call: Call<VideoResponse>, t: Throwable) {
+                    videosMovie.postValue(null)
 
                     Log.d("API_CALL", "API call failed. Throwable: ${t.message}")
                 }
