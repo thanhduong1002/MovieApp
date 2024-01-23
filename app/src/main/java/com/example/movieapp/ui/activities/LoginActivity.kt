@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import com.example.movieapp.databinding.ActivityLoginBinding
+import com.example.movieapp.utils.KeyboardUtil
 import com.example.movieapp.utils.StringUtil
 
 class LoginActivity : AppCompatActivity() {
@@ -22,11 +24,7 @@ class LoginActivity : AppCompatActivity() {
 
         checkSharedPreferences()
 
-        binding.apply {
-            buttonLogin.setOnClickListener {
-                checkLoginEvent()
-            }
-        }
+        handleOnClick()
     }
 
     private fun checkLoginEvent() {
@@ -106,6 +104,24 @@ class LoginActivity : AppCompatActivity() {
 
                 val dialog: AlertDialog = builder.create()
                 dialog.show()
+            }
+        }
+    }
+
+    private fun handleOnClick() {
+        binding.apply {
+            buttonLogin.setOnClickListener {
+                checkLoginEvent()
+            }
+            editTextPassword.setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> {
+                        KeyboardUtil.hideKeyboard(this@LoginActivity)
+
+                        true
+                    }
+                    else -> false
+                }
             }
         }
     }

@@ -9,4 +9,7 @@
     <color name="colorPrimaryDark">#800000</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="backgroundLightButton">#D6D7D7</color>
+    <color name="backgroundTab1">#200B0B</color>
+    <color name="backgroundScore">#081C22</color>
+    <color name="darkBrown">#1C0B0B</color>
 </resources>
